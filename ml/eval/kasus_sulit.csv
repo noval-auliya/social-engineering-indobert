@@ -1,0 +1,51 @@
+Teks,label,kategori
+"Nomor baruku 081234567890 ya, simpan.",0,normal_dengan_nomor
+"Ini nomor HP Pak Andi 0857-1234-5678, langsung hubungi beliau soal proyeknya.",0,normal_dengan_nomor
+"Transfer uang arisan ke rekening BCA 1234567890 a.n. Siti ya bu, makasih.",0,normal_dengan_nomor
+"Kalau butuh tukang AC, hubungi Mas Joko 081398765432, orangnya jujur.",0,normal_dengan_nomor
+"Nomor rekening kantor untuk reimburse: Mandiri 1370012345678 a.n. PT Maju Jaya.",0,normal_dengan_nomor
+"Kak, aku ganti nomor. Yang lama hilang sama HP-nya. Ini nomor baru 0896 4455 2211, save ya.",0,normal_dengan_nomor
+"Pak, untuk DP sewa gedung bisa ke BRI 0021-01-234567-50-3 atas nama Hendra, sisanya pelunasan H-7.",0,normal_dengan_nomor
+"Nanti jemput di lobby aja ya, kalau susah cari telepon aku di 0812 7788 9900.",0,normal_dengan_nomor
+"Bu guru, ini nomor ayahnya Raka 085211223344 kalau ada apa-apa di sekolah.",0,normal_dengan_nomor
+"Patungan kado buat Bu Rina 50rb per orang, kirim ke Dana 0821-3344-5566 (Mita) paling lambat Jumat.",0,normal_dengan_nomor
+"Bengkel langganan aku namanya Sinar Motor, nomornya 0274-512345, bilang aja temennya Dimas.",0,normal_dengan_nomor
+"No resi paketnya JNE 1234 5678 9012, katanya sampai besok siang.",0,normal_dengan_nomor
+"Gaji bulan ini sudah ditransfer ke rekening 8890123456 ya Mbak, mohon dicek.",0,normal_dengan_nomor
+"Mas, nomor kamar hotel kita 1205, nomor booking 87654321, nanti check in jam 2.",0,normal_dengan_nomor
+"Kalau lewat WA susah, email aku aja atau telepon ke +62 813 2233 4455.",0,normal_dengan_nomor
+"Iuran kas RT bulan ini 30rb, bisa transfer ke BNI 0123456789 a.n. Bendahara RT 05.",0,normal_dengan_nomor
+"Dok, saya pasien atas nama Wati, nomor rekam medis 00456123, mau tanya jadwal kontrol.",0,normal_dengan_nomor
+"Nomor ruangan ujian kamu B-204, nomor peserta 2026103344, jangan sampai lupa kartu ujian.",0,normal_dengan_nomor
+"Ini kontak tukang galon yang biasa antar ke rumah: 0819 1234 0000, Pak Udin.",0,normal_dengan_nomor
+"Pembayaran kos bulan depan transfer ke rekening Mandiri 1440098765432 seperti biasa ya, makasih.",0,normal_dengan_nomor
+"Selamat siang, saya dari bagian keamanan bank. Demi keamanan akun, mohon sebutkan kode yang baru saja masuk ke HP Bapak.",1,penipuan_tanpa_nomor
+"Anakmu kecelakaan di jalan dan sekarang di rumah sakit, butuh uang untuk operasi segera, jangan bilang siapa-siapa dulu.",1,penipuan_tanpa_nomor
+"Akun Instagram kamu dilaporkan melanggar hak cipta. Login di halaman banding berikut dalam 24 jam atau akun dihapus permanen.",1,penipuan_tanpa_nomor
+"Mohon maaf mengganggu, saya teman lama kamu. Lagi butuh bantuan mendesak, bisa pinjam uang dulu? Nanti malam aku ganti.",1,penipuan_tanpa_nomor
+"Paket kamu ditahan bea cukai, harus bayar denda sekarang supaya tidak disita. Bayar lewat petugas kami ya.",1,penipuan_tanpa_nomor
+"Undangan pernikahan kami, mohon dibuka ya kak: Undangan_Digital.apk",1,penipuan_tanpa_nomor
+"Kak, ini foto bukti transfernya ya, dibuka aja filenya: Bukti_Transfer.apk",1,penipuan_tanpa_nomor
+"Kamu lolos seleksi kerja di perusahaan BUMN. Untuk seragam dan pelatihan, bayar biaya pendaftaran dulu lewat admin ya.",1,penipuan_tanpa_nomor
+"Saldo e-wallet kamu akan hangus malam ini. Klaim sekarang dengan login lewat link yang kami kirim, masukkan PIN untuk konfirmasi.",1,penipuan_tanpa_nomor
+"Selamat, kamu dapat cashback 2 juta dari marketplace! Tinggal verifikasi dengan kirim kode OTP yang masuk ke SMS ya.",1,penipuan_tanpa_nomor
+"Bos lagi rapat dan minta tolong belikan voucher game senilai 1 juta, kodenya kirim ke saya, nanti diganti kantor.",1,penipuan_tanpa_nomor
+"Halo, saya kurir. Paketnya sudah sampai tapi alamat kurang jelas, tolong buka file ini untuk konfirmasi lokasi: Konfirmasi_Alamat.apk",1,penipuan_tanpa_nomor
+"Transfer biaya admin Rp500.000 ke rekening BRI 0987654321 untuk mencairkan hadiah undian mobil Anda.",1,penipuan_dengan_nomor
+"Hubungi admin kami di 0812 9999 8888 untuk klaim hadiah 100 juta, hanya berlaku hari ini.",1,penipuan_dengan_nomor
+"Kode verifikasi WhatsApp kamu terkirim ke nomorku, tolong kirim balik 6 digit kodenya ke 0856 1122 3344 ya.",1,penipuan_dengan_nomor
+"Pinjaman cair 30 juta tanpa jaminan, bayar asuransi pinjaman dulu Rp400rb ke rek BCA 7712345678.",1,penipuan_dengan_nomor
+"Investasi pasti untung 20% per minggu, transfer modal ke rekening Mandiri 1230045678901 dan konfirmasi ke 081277778888.",1,penipuan_dengan_nomor
+"Mama, ini aku. Lagi ditahan polisi, tolong transfer 3 juta ke rekening 6655443322 sekarang, jangan telepon dulu.",1,penipuan_dengan_nomor
+"Rekening Anda terblokir. Untuk membuka, hubungi customer care resmi di +62 821 0000 1111 dan sebutkan PIN ATM Anda.",1,penipuan_dengan_nomor
+"Anda terpilih jadi reseller resmi, kirim deposit 250rb ke Dana 0838 1234 5678 untuk aktivasi akun.",1,penipuan_dengan_nomor
+"Promo spesial! Paket internet 50GB cuma 75rb, aktifkan di *363# atau hubungi 188.",2,promo_dengan_nomor
+"Diskon 30% semua menu hari ini! Pesan antar lewat WA 0812 3456 7890, gratis ongkir area kota.",2,promo_dengan_nomor
+"Flash sale sepatu mulai 99rb, order langsung ke 0857 6655 4433 ya kak, stok terbatas.",2,promo_dengan_nomor
+"Cashback 20% isi ulang pulsa via aplikasi, kode promo HEMAT20 berlaku sampai 31 Oktober.",2,promo_dengan_nomor
+"Laundry kiloan promo 5rb/kg minggu ini, bisa antar jemput, hubungi 0274 556677.",2,promo_dengan_nomor
+"Mas, motornya sudah selesai diservis ya, total 185 ribu, bisa diambil sore ini.",0,normal_tanpa_nomor
+"Besok aku izin nggak masuk ya, anakku demam dari semalam, nanti kerjaanku aku kirim lewat email.",0,normal_tanpa_nomor
+"Jangan lupa bawa payung, katanya nanti sore hujan deras.",0,normal_tanpa_nomor
+"Pak, tolong transfer uang SPP adik bulan ini ya, rekening sekolah yang biasa.",0,normal_tanpa_nomor
+"Kode promo yang kemarin sudah aku pakai, ternyata cuma dapat diskon 10 persen.",0,normal_tanpa_nomor

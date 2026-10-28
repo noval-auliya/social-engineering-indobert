@@ -1,0 +1,50 @@
+name: social_engineering_detector
+description: >-
+  Aplikasi mobile deteksi social engineering pada pesan WhatsApp dan
+  visualisasi risiko malware Android (tampilan + data dummy interaktif).
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # Charts / visualisasi
+  fl_chart: ^0.69.0
+
+  # Simulasi pilih file APK (malware analysis)
+  file_picker: 13.3.0
+
+  # Izin (disiapkan untuk integrasi nyata, UI dummy tidak memakainya)
+  permission_handler: ^11.3.1
+
+  # Penyimpanan ringan (riwayat/pengaturan lokal dummy)
+  shared_preferences: ^2.3.2
+
+  intl: ^0.19.0
+  flutter_onnxruntime: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    # Model IndoBERT ONNX + vocab + config, dibuat oleh ml/export_onnx.py
+    - assets/ai/
+    # Model + aturan + sertifikat resmi untuk analisis APK (ml/malware/)
+    - assets/malware/
+  # assets:
+  #   - assets/images/
+  #   - assets/icons/

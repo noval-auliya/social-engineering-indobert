@@ -1,0 +1,12 @@
+{
+  "model_file": "indobert_se_c13783bd33.onnx",
+  "base_model": "indobenchmark/indobert-base-p1",
+  "labels": [
+    "normal",
+    "penipuan",
+    "promo"
+  ],
+  "risk_label": "penipuan",
+  "max_len": 256,
+  "do_lower_case": true
+}

@@ -1,0 +1,30 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Android signing / secrets (JANGAN di-commit)
+*.jks
+*.keystore
+key.properties
+android/app/google-services.json
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Hasil training & ekspor model (besar, bisa dibuat ulang)
+ml/output/
+ml/data/dataset_sms_spam_v1.csv
+ml/.venv/
+__pycache__/

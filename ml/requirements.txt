@@ -1,0 +1,11 @@
+# Hanya untuk development (training + ekspor). Tidak dipakai di aplikasi.
+# Di laptop tanpa GPU, pasang torch versi CPU dulu:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch
+transformers>=4.44
+accelerate
+scikit-learn
+pandas
+onnx
+onnxruntime
+onnxscript
