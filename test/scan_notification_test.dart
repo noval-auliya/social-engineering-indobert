@@ -64,8 +64,9 @@ void main() {
     // Notifikasi: 1 dari 2 pesan berisiko, tombol Lihat.
     expect(find.text('1 dari 2 pesan WhatsApp berisiko!'), findsOneWidget);
     // Badge jumlah hasil baru di tab Riwayat.
+    // Badge di tab Riwayat (lonceng di Beranda juga menampilkan angka).
     final badgeCount =
-        find.descendant(of: find.byType(Badge), matching: find.text('2'));
+        find.descendant(of: find.byTooltip('Riwayat'), matching: find.text('2'));
     expect(badgeCount, findsOneWidget);
 
     await tester.tap(find.text('Lihat'));
@@ -74,7 +75,7 @@ void main() {
     expect(find.text('Otomatis · Penipu'), findsOneWidget);
 
     // Keluar dari Riwayat -> penanda BARU & badge hilang.
-    await tester.tap(find.text('Beranda'));
+    await tester.tap(find.byTooltip('Beranda'));
     await tester.pumpAndSettle();
     expect(badgeCount, findsNothing);
     expect(find.text('BARU', skipOffstage: false), findsNothing);

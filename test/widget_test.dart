@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,16 +13,30 @@ AnalysisService _keywordOnly() =>
     AnalysisService(loadModel: () => Future.error('tanpa model'));
 
 void main() {
-  testWidgets('App memuat dan menampilkan dashboard', (tester) async {
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        analysisServiceProvider.overrideWithValue(_keywordOnly()),
-        localStoreProvider.overrideWithValue(MemoryLocalStore()),
-      ],
-      child: const SocialEngineeringApp(),
-    ));
+  testWidgets('Pertama kali: onboarding -> Lewati -> Beranda, tidak muncul lagi',
+      (tester) async {
+    final store = MemoryLocalStore();
+    Widget app() => ProviderScope(
+          overrides: [
+            analysisServiceProvider.overrideWithValue(_keywordOnly()),
+            localStoreProvider.overrideWithValue(store),
+          ],
+          child: const SocialEngineeringApp(),
+        );
+    await tester.pumpWidget(app());
     await tester.pumpAndSettle();
-    expect(find.text('Total Analisis'), findsOneWidget);
+    expect(find.text('Penjaga pesan pribadimu'), findsOneWidget);
+
+    await tester.tap(find.text('Lewati'));
+    await tester.pumpAndSettle();
+    expect(find.text('Skor perlindungan'), findsOneWidget);
+
+    // Dibuka ulang (aplikasi baru, penyimpanan sama): langsung ke Beranda.
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+    expect(find.text('Penjaga pesan pribadimu'), findsNothing);
+    expect(find.text('Skor perlindungan'), findsOneWidget);
   });
 
   test('Cadangan kata kunci: pesan phishing -> risiko tinggi', () async {

@@ -5,6 +5,8 @@ import 'core/theme/app_theme.dart';
 import 'core/constants/app_constants.dart';
 import 'providers/providers.dart';
 import 'features/home/home_shell.dart';
+import 'features/onboarding/onboarding_page.dart';
+import 'widgets/warm_background.dart';
 
 void main() {
   runApp(const ProviderScope(child: SocialEngineeringApp()));
@@ -45,7 +47,27 @@ class SocialEngineeringApp extends ConsumerWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: mode,
-      home: const HomeShell(),
+      home: const _StartGate(),
+    );
+  }
+}
+
+/// Onboarding sekali saja. Menunggu pengaturan dimuat agar pengguna lama
+/// tidak melihat onboarding berkedip sesaat.
+class _StartGate extends ConsumerWidget {
+  const _StartGate();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loaded = ref.watch(settingsLoadedProvider);
+    final done = ref.watch(settingsProvider.select((s) => s.onboardingDone));
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      child: loaded.isLoading
+          ? const WarmBackground(intensity: 1, child: SizedBox.expand())
+          : done
+              ? const HomeShell()
+              : const OnboardingPage(),
     );
   }
 }

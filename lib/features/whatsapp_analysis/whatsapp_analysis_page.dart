@@ -34,9 +34,11 @@ class _WhatsAppAnalysisPageState extends ConsumerState<WhatsAppAnalysisPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      // Transparan: gradasi HomeShell terlihat; navigasi melayang di bawah.
+      backgroundColor: Colors.transparent,
       appBar: AppBar(title: const Text('Analisis Pesan WhatsApp')),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
         children: [
           Text('Tempel pesan yang ingin diperiksa',
               style: theme.textTheme.titleMedium),

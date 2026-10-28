@@ -6,7 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// itu tidak ikut masuk APK ("Unable to load asset" saat aplikasi berjalan).
 void main() {
   test('Semua file di assets/ terdaftar di pubspec.yaml', () {
-    final declared = RegExp(r'^\s+-\s+(assets/\S*)', multiLine: true)
+    // "- assets/..." (bagian assets) atau "- asset: assets/..." (bagian fonts).
+    final declared = RegExp(r'^\s+-\s+(?:asset:\s+)?(assets/\S*)', multiLine: true)
         .allMatches(File('pubspec.yaml').readAsStringSync())
         .map((m) => m.group(1)!)
         .toList();

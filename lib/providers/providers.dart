@@ -40,6 +40,29 @@ class HistoryNotifier extends StateNotifier<List<HistoryItem>> {
 
   LocalStore get _store => _ref.read(localStoreProvider);
 
+  /// Tarik-untuk-segarkan: muat ulang dari HP (mis. entri dari scan latar
+  /// belakang yang ditulis mesin Flutter lain).
+  Future<void> reload() async {
+    await loaded;
+    if (!_ref.read(settingsProvider).saveHistory) return;
+    final raw = await _store.read(storageKey);
+    if (raw == null || !mounted) return;
+    try {
+      final saved = [
+        for (final j in (jsonDecode(raw) as List).cast<Map<String, dynamic>>())
+          HistoryItem.fromJson(j),
+      ];
+      // Pertahankan objek lama yang sama (penanda "BARU" memakai identitas).
+      final known = {for (final h in state) _identity(h): h};
+      state = applyRetention([for (final h in saved) known[_identity(h)] ?? h]);
+    } catch (e) {
+      debugPrint('Muat ulang riwayat gagal: $e');
+    }
+  }
+
+  static String _identity(HistoryItem h) =>
+      '${h.title}|${h.createdAt.toIso8601String()}|${h.analysis?.message ?? h.malware?.sha256}';
+
   Future<void> _load() async {
     await _ref.read(settingsProvider.notifier).loaded;
     if (!_ref.read(settingsProvider).saveHistory) return;
@@ -178,6 +201,52 @@ class CorrectionsNotifier extends StateNotifier<List<Correction>> {
 final correctionsProvider =
     StateNotifierProvider<CorrectionsNotifier, List<Correction>>(
         (ref) => CorrectionsNotifier(ref.read(localStoreProvider)));
+
+/// Tab aktif di HomeShell (lihat HomeTab), agar halaman lain & notifikasi
+/// bisa berpindah tab.
+final homeTabProvider = StateProvider<int>((ref) => HomeTab.dashboard);
+
+abstract final class HomeTab {
+  static const dashboard = 0;
+  static const messages = 1;
+  static const malware = 2;
+  static const history = 3;
+  static const settings = 4;
+}
+
+/// Ringkasan aktivitas deteksi dalam [days] hari terakhir (Beranda).
+class ActivityStats {
+  final int scamMessages; // pesan HIGH RISK / MALICIOUS
+  final int suspiciousMessages;
+  final int safeMessages;
+  final int apksChecked;
+  final int riskyApks;
+  const ActivityStats(this.scamMessages, this.suspiciousMessages,
+      this.safeMessages, this.apksChecked, this.riskyApks);
+}
+
+final activityStatsProvider = Provider.family<ActivityStats, int>((ref, days) {
+  final since = DateTime.now().subtract(Duration(days: days));
+  var scam = 0, sus = 0, safe = 0, apks = 0, riskyApks = 0;
+  for (final h in ref.watch(historyProvider)) {
+    if (h.createdAt.isBefore(since)) continue;
+    if (h.kind == HistoryKind.malware) {
+      apks++;
+      if (h.severity.index >= Severity.high.index) riskyApks++;
+    } else {
+      switch (h.severity) {
+        case Severity.low:
+          safe++;
+        case Severity.medium:
+          sus++;
+        case Severity.high:
+        case Severity.critical:
+          scam++;
+      }
+    }
+  }
+  return ActivityStats(scam, sus, safe, apks, riskyApks);
+});
 
 /// Entri hasil scan otomatis yang belum dilihat (badge & label "BARU").
 final unseenHistoryProvider = StateProvider<Set<HistoryItem>>((ref) => {});
@@ -474,26 +543,37 @@ class AppSettings {
   final bool saveHistory;
   final bool softLabels;
 
+  /// Layar perkenalan sudah dilihat (hanya tampil sekali).
+  final bool onboardingDone;
+
   const AppSettings({
     this.theme = ThemeChoice.system,
     this.saveHistory = true,
     this.softLabels = true,
+    this.onboardingDone = false,
   });
 
-  AppSettings copyWith({ThemeChoice? theme, bool? saveHistory, bool? softLabels}) =>
+  AppSettings copyWith(
+          {ThemeChoice? theme, bool? saveHistory, bool? softLabels, bool? onboardingDone}) =>
       AppSettings(
         theme: theme ?? this.theme,
         saveHistory: saveHistory ?? this.saveHistory,
         softLabels: softLabels ?? this.softLabels,
+        onboardingDone: onboardingDone ?? this.onboardingDone,
       );
 
-  Map<String, dynamic> toJson() =>
-      {'theme': theme.name, 'save_history': saveHistory, 'soft_labels': softLabels};
+  Map<String, dynamic> toJson() => {
+        'theme': theme.name,
+        'save_history': saveHistory,
+        'soft_labels': softLabels,
+        'onboarding_done': onboardingDone,
+      };
 
   factory AppSettings.fromJson(Map<String, dynamic> j) => AppSettings(
         theme: ThemeChoice.values.asNameMap()[j['theme']] ?? ThemeChoice.system,
         saveHistory: j['save_history'] as bool? ?? true,
         softLabels: j['soft_labels'] as bool? ?? true,
+        onboardingDone: j['onboarding_done'] as bool? ?? false,
       );
 }
 
@@ -531,7 +611,12 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   void setTheme(ThemeChoice t) => _set(state.copyWith(theme: t));
   void toggleSaveHistory(bool v) => _set(state.copyWith(saveHistory: v));
   void toggleSoftLabels(bool v) => _set(state.copyWith(softLabels: v));
+  void completeOnboarding() => _set(state.copyWith(onboardingDone: true));
 }
 
 final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>(
     (ref) => SettingsNotifier(ref.read(localStoreProvider)));
+
+/// Selesai saat pengaturan tersimpan sudah dimuat (untuk gerbang onboarding).
+final settingsLoadedProvider =
+    FutureProvider<void>((ref) => ref.read(settingsProvider.notifier).loaded);

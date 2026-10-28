@@ -20,9 +20,11 @@ class SettingsPage extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      // Transparan: gradasi HomeShell terlihat; navigasi melayang di bawah.
+      backgroundColor: Colors.transparent,
       appBar: AppBar(title: const Text('Pengaturan')),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
         children: [
           Text('Tampilan', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
