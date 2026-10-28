@@ -7,11 +7,13 @@ class WaMonitorStatus {
   final bool granted; // izin "Akses notifikasi" sudah diberikan
   final bool enabled;
   final int minLength; // hanya pesan >= minLength karakter yang di-scan
+  final bool alerts; // scan latar belakang + notifikasi pesan berisiko
 
   const WaMonitorStatus({
     required this.granted,
     required this.enabled,
     required this.minLength,
+    this.alerts = true,
   });
 }
 
@@ -33,6 +35,7 @@ class WaNotificationService {
         granted: map['granted'] as bool? ?? false,
         enabled: map['enabled'] as bool? ?? true,
         minLength: (map['minLength'] as num?)?.toInt() ?? 150,
+        alerts: map['alerts'] as bool? ?? true,
       );
     } on MissingPluginException {
       return null;
@@ -43,11 +46,30 @@ class WaNotificationService {
 
   Future<void> openPermissionSettings() => _method.invokeMethod('openSettings');
 
-  Future<void> setConfig({required bool enabled, required int minLength}) =>
+  Future<void> setConfig(
+          {required bool enabled, required int minLength, required bool alerts}) =>
       _method.invokeMethod('setConfig', {
         'enabled': enabled,
         'minLength': minLength,
+        'alerts': alerts,
       });
+
+  /// Notifikasi sistem Android (muncul walau aplikasi tertutup).
+  Future<void> showRiskAlert(
+          {required int id, required String title, required String body}) =>
+      _method.invokeMethod('showRiskAlert', {'id': id, 'title': title, 'body': body});
+
+  /// Tab tujuan bila aplikasi dibuka dari notifikasi (sekali baca), mis. "history".
+  Future<String?> consumeLaunchTarget() async {
+    try {
+      return await _method.invokeMethod<String>('consumeLaunchTarget');
+    } on MissingPluginException {
+      return null;
+    }
+  }
+
+  /// Mesin latar belakang selesai memproses antrean -> boleh dimatikan.
+  Future<void> backgroundIdle() => _method.invokeMethod('backgroundIdle');
 
   /// Mengambil pesan yang menunggu di antrean native lalu mengosongkannya.
   Future<List<CapturedMessage>> drain() async {

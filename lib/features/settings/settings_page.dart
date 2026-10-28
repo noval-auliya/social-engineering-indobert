@@ -1,8 +1,14 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../../models/correction.dart';
 import '../../providers/providers.dart';
+import '../../services/correction_export.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -49,6 +55,8 @@ class SettingsPage extends ConsumerWidget {
           const SizedBox(height: 16),
           const _WaMonitorSection(),
           const SizedBox(height: 16),
+          const _CorrectionsSection(),
+          const SizedBox(height: 16),
           Text('Privasi & Data', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           Card(
@@ -57,8 +65,11 @@ class SettingsPage extends ConsumerWidget {
                 SwitchListTile(
                   value: s.saveHistory,
                   onChanged: notifier.toggleSaveHistory,
-                  title: const Text('Simpan riwayat analisis'),
-                  subtitle: const Text('Hanya metadata, bukan isi pesan penuh.'),
+                  title: const Text('Simpan riwayat di HP'),
+                  subtitle: const Text(
+                      'Riwayat (termasuk isi pesan) tetap ada setelah aplikasi '
+                      'ditutup. Jika dimatikan, riwayat hanya ada selama '
+                      'aplikasi terbuka dan salinan di HP dihapus.'),
                 ),
                 SwitchListTile(
                   value: s.softLabels,
@@ -93,6 +104,82 @@ class SettingsPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Koreksi pengguna -> CSV untuk melatih ulang model (ml/README.md).
+class _CorrectionsSection extends ConsumerWidget {
+  const _CorrectionsSection();
+
+  Future<void> _export(BuildContext context, String fileName, String csv) async {
+    try {
+      final saved = await FilePicker.saveFile(
+        fileName: fileName,
+        bytes: Uint8List.fromList(utf8.encode(csv)),
+        mimeType: 'text/csv',
+      );
+      if (saved != null && context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$fileName tersimpan.')));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Gagal menyimpan: $e')));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final all = ref.watch(correctionsProvider);
+    final theme = Theme.of(context);
+    final messages = all.where((c) => c.kind == CorrectionKind.message).length;
+    final apks = all.length - messages;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Data Koreksi (melatih ulang AI)', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Card(
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.flag_outlined),
+                title: Text('$messages koreksi pesan · $apks koreksi APK'),
+                subtitle: const Text(
+                    'Tandai hasil yang salah lewat detail Riwayat. Data hanya '
+                    'tersimpan di HP sampai Anda mengekspornya.'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.download_outlined),
+                title: const Text('Ekspor koreksi pesan (CSV)'),
+                subtitle: const Text('Salin ke ml/data/ lalu jalankan train.py'),
+                enabled: messages > 0,
+                onTap: () => _export(context, 'koreksi_pesan.csv',
+                    messageCorrectionsCsv(all)),
+              ),
+              ListTile(
+                leading: const Icon(Icons.download_outlined),
+                title: const Text('Ekspor koreksi APK (CSV)'),
+                subtitle: const Text(
+                    'Salin ke ml/malware/data/ lalu jalankan train_malware.py'),
+                enabled: apks > 0,
+                onTap: () =>
+                    _export(context, 'koreksi_apk.csv', apkCorrectionsCsv(all)),
+              ),
+              ListTile(
+                leading: Icon(Icons.delete_outline, color: theme.colorScheme.error),
+                title: const Text('Hapus semua koreksi'),
+                enabled: all.isNotEmpty,
+                onTap: () => ref.read(correctionsProvider.notifier).clear(),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -190,6 +277,15 @@ class _WaMonitorSection extends ConsumerWidget {
                 title: const Text('Pantau pesan WhatsApp'),
                 subtitle:
                     const Text('Hasil scan masuk ke Riwayat secara otomatis.'),
+              ),
+              SwitchListTile(
+                value: s.alerts,
+                onChanged: s.granted && s.enabled ? notifier.setAlerts : null,
+                title: const Text('Peringatan pesan berisiko'),
+                subtitle: const Text(
+                    'Notifikasi muncul walau aplikasi tertutup. Pesan di-scan di '
+                    'latar belakang (memakai sedikit baterai). Jika dimatikan, '
+                    'pesan baru di-scan saat aplikasi dibuka.'),
               ),
               ListTile(
                 title: const Text('Hanya scan pesan panjang'),

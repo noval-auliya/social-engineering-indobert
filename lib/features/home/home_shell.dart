@@ -28,6 +28,28 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     SettingsPage(),
   ];
 
+  AppLifecycleListener? _lifecycle;
+
+  @override
+  void initState() {
+    super.initState();
+    _openFromNotification();
+    _lifecycle = AppLifecycleListener(onResume: _openFromNotification);
+  }
+
+  @override
+  void dispose() {
+    _lifecycle?.dispose();
+    super.dispose();
+  }
+
+  /// Dibuka dengan mengetuk notifikasi peringatan -> langsung ke Riwayat.
+  Future<void> _openFromNotification() async {
+    final target =
+        await ref.read(waNotificationServiceProvider).consumeLaunchTarget();
+    if (target == 'history' && mounted) _select(_historyTab);
+  }
+
   void _select(int i) {
     // Penanda "BARU" hilang setelah pengguna meninggalkan tab Riwayat.
     if (_index == _historyTab && i != _historyTab) {

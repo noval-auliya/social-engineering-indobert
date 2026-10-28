@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:social_engineering_detector/main.dart';
 import 'package:social_engineering_detector/providers/providers.dart';
+import 'package:social_engineering_detector/services/local_store.dart';
 import 'package:social_engineering_detector/services/analysis_service.dart';
 import 'package:social_engineering_detector/models/analysis_result.dart';
 
@@ -13,7 +14,10 @@ AnalysisService _keywordOnly() =>
 void main() {
   testWidgets('App memuat dan menampilkan dashboard', (tester) async {
     await tester.pumpWidget(ProviderScope(
-      overrides: [analysisServiceProvider.overrideWithValue(_keywordOnly())],
+      overrides: [
+        analysisServiceProvider.overrideWithValue(_keywordOnly()),
+        localStoreProvider.overrideWithValue(MemoryLocalStore()),
+      ],
       child: const SocialEngineeringApp(),
     ));
     await tester.pumpAndSettle();

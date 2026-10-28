@@ -6,6 +6,7 @@ import 'package:social_engineering_detector/features/history/history_page.dart';
 import 'package:social_engineering_detector/features/home/home_shell.dart';
 import 'package:social_engineering_detector/models/captured_message.dart';
 import 'package:social_engineering_detector/providers/providers.dart';
+import 'package:social_engineering_detector/services/local_store.dart';
 import 'package:social_engineering_detector/services/analysis_service.dart';
 import 'package:social_engineering_detector/services/wa_notification_service.dart';
 
@@ -46,6 +47,7 @@ void main() {
       (tester) async {
     await tester.pumpWidget(ProviderScope(
       overrides: [
+        localStoreProvider.overrideWithValue(MemoryLocalStore()),
         waNotificationServiceProvider.overrideWithValue(_FakeWa()),
         analysisServiceProvider.overrideWithValue(
             AnalysisService(loadModel: () => Future.error('tanpa model'))),
@@ -81,6 +83,7 @@ void main() {
   testWidgets('Banner animasi menampilkan progres scan', (tester) async {
     await tester.pumpWidget(ProviderScope(
       overrides: [
+        localStoreProvider.overrideWithValue(MemoryLocalStore()),
         scanProgressProvider.overrideWith((ref) => const ScanProgress(
             active: true, done: 1, total: 3, currentSender: 'Budi')),
       ],

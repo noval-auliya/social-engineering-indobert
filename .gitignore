@@ -28,3 +28,4 @@ ml/output/
 ml/data/dataset_sms_spam_v1.csv
 ml/.venv/
 __pycache__/
+ml/malware/data/kronodroid/

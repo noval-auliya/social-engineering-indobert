@@ -35,7 +35,7 @@ class WaNotificationListener : NotificationListenerService() {
             if (msg.text.trim().length < minLength) continue
             if (WaListenerStore.add(this, msg)) added = true
         }
-        if (added) mainHandler.post { WaListenerStore.onNewMessage?.invoke() }
+        if (added) mainHandler.post { BackgroundScanner.onMessagesQueued(applicationContext) }
     }
 
     private fun extractMessages(sbn: StatusBarNotification): List<CapturedMessage> {

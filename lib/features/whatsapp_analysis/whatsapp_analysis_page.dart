@@ -100,8 +100,8 @@ class _WhatsAppAnalysisPageState extends ConsumerState<WhatsAppAnalysisPage> {
             loading: () => const Padding(
               padding: EdgeInsets.symmetric(vertical: 40),
               child: LoadingWidget(
-                  message: 'Menganalisis dengan IndoBERT + LIME...\n'
-                      'Bisa 5–20 detik, semua diproses di HP.'),
+                  message: 'Menganalisis dengan IndoBERT...\n'
+                      'Semua diproses di HP.'),
             ),
             error: (e, _) => _ErrorBox(message: '$e'),
           ),

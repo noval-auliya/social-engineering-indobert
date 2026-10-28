@@ -10,6 +10,22 @@ void main() {
   runApp(const ProviderScope(child: SocialEngineeringApp()));
 }
 
+/// Entrypoint mesin Flutter tanpa layar, dinyalakan oleh BackgroundScanner.kt
+/// saat pesan WhatsApp masuk dan aplikasi tertutup. Memakai provider yang
+/// sama dengan aplikasi: scan -> simpan riwayat -> notifikasi pesan berisiko.
+@pragma('vm:entry-point')
+Future<void> backgroundScanMain() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final container = ProviderContainer(
+      overrides: [backgroundEngineProvider.overrideWithValue(true)]);
+  // Riwayat harus selesai dimuat agar entri baru tidak menimpa yang lama.
+  container.read(historyProvider);
+  await container.read(historyProvider.notifier).loaded;
+  await container.read(waMonitorProvider.notifier).ready;
+  // Container dibiarkan hidup: pesan berikutnya diproses lewat event stream
+  // sampai BackgroundScanner mematikan mesin ini.
+}
+
 class SocialEngineeringApp extends ConsumerWidget {
   const SocialEngineeringApp({super.key});
 

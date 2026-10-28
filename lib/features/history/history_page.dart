@@ -39,14 +39,16 @@ class HistoryPage extends ConsumerWidget {
                 ? ScanProgressBanner(progress: scan)
                 : const SizedBox(width: double.infinity),
           ),
-          Expanded(child: _buildList(context, history, unseen, scheme, df)),
+          Expanded(
+              child: _buildList(context, history, unseen, scheme, df,
+                  ref.watch(settingsProvider.select((s) => s.softLabels)))),
         ],
       ),
     );
   }
 
   Widget _buildList(BuildContext context, List<HistoryItem> history,
-      Set<HistoryItem> unseen, ColorScheme scheme, DateFormat df) {
+      Set<HistoryItem> unseen, ColorScheme scheme, DateFormat df, bool soft) {
     return history.isEmpty
           ? Center(
               child: Column(
@@ -124,7 +126,7 @@ class HistoryPage extends ConsumerWidget {
                         color: color.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(h.badge,
+                      child: Text(h.badge(soft: soft),
                           style: TextStyle(
                               color: color,
                               fontSize: 11,
@@ -141,7 +143,8 @@ class HistoryPage extends ConsumerWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Hapus riwayat?'),
-        content: const Text('Semua entri riwayat (dummy) akan dihapus.'),
+        content: const Text(
+            'Semua entri riwayat akan dihapus, termasuk yang tersimpan di HP.'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),

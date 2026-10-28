@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/analysis_result.dart';
+import '../../providers/providers.dart';
 import '../../widgets/lime_word.dart';
 import '../../widgets/risk_gauge.dart';
 
 /// Tampilan hasil analisis pesan + penjelasan LIME.
-class AnalysisResultView extends StatelessWidget {
+class AnalysisResultView extends ConsumerWidget {
   final AnalysisResult result;
   const AnalysisResultView({super.key, required this.result});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final soft = ref.watch(settingsProvider.select((s) => s.softLabels));
     final theme = Theme.of(context);
     final color = AppTheme.riskColor(result.riskLevel);
     final safeColor = AppTheme.riskColor(RiskLevel.safe);
@@ -35,7 +38,7 @@ class AnalysisResultView extends StatelessWidget {
                 RiskGauge(
                   value: result.score,
                   color: color,
-                  label: result.riskLevel.label,
+                  label: soft ? result.riskLevel.labelId : result.riskLevel.label,
                   caption: 'Confidence ${(result.confidence * 100).round()}%',
                 ),
                 const SizedBox(height: 6),
@@ -63,16 +66,33 @@ class AnalysisResultView extends StatelessWidget {
         Card(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-            child: Column(
-              children: [
-                for (final e in result.explanation)
-                  LimeWord(
-                      item: e,
-                      maxWeight: maxWeight,
-                      color: color,
-                      safeColor: safeColor),
-              ],
-            ),
+            child: result.explanationPending
+                // Tahap 2: skor sudah tampil, LIME (~100x inferensi) menyusul.
+                ? Row(
+                    children: [
+                      const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                            'Menyusun penjelasan: menguji ~100 variasi pesan '
+                            'di HP. Biasanya 5–15 detik.',
+                            style: theme.textTheme.bodySmall),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      for (final e in result.explanation)
+                        LimeWord(
+                            item: e,
+                            maxWeight: maxWeight,
+                            color: color,
+                            safeColor: safeColor),
+                    ],
+                  ),
           ),
         ),
         if (result.probabilities.isNotEmpty) ...[

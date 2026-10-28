@@ -33,13 +33,28 @@ object WaListenerStore {
     private const val KEY_ENABLED = "enabled"
     private const val KEY_MIN_LENGTH = "min_length"
     private const val KEY_SINCE = "since"
+    private const val KEY_ALERTS = "alerts"
     private const val MAX_QUEUE = 200
     private const val MAX_SEEN = 500
 
     const val DEFAULT_MIN_LENGTH = 150
 
-    /** Dipanggil (di main thread) saat ada pesan baru masuk antrean. */
-    var onNewMessage: (() -> Unit)? = null
+    /**
+     * Pendengar pesan baru dari setiap mesin Flutter yang hidup (UI dan/atau
+     * latar belakang). Yang terakhir didaftarkan yang diberi tahu. Hanya
+     * diakses dari main thread.
+     */
+    private val listeners = ArrayList<() -> Unit>()
+
+    fun addListener(l: () -> Unit) { listeners += l }
+    fun removeListener(l: () -> Unit) { listeners.remove(l) }
+
+    /** Memberi tahu mesin Flutter teratas; false jika tidak ada yang hidup. */
+    fun notifyNewMessage(): Boolean {
+        val top = listeners.lastOrNull() ?: return false
+        top()
+        return true
+    }
 
     private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -54,11 +69,15 @@ object WaListenerStore {
         prefs(c).edit().putLong(KEY_SINCE, System.currentTimeMillis()).apply()
     }
 
-    fun setConfig(c: Context, enabled: Boolean, minLength: Int) {
+    /** Scan di latar belakang + notifikasi sistem untuk pesan berisiko. */
+    fun alertsEnabled(c: Context) = prefs(c).getBoolean(KEY_ALERTS, true)
+
+    fun setConfig(c: Context, enabled: Boolean, minLength: Int, alerts: Boolean) {
         val turnedOn = enabled && !isEnabled(c)
         prefs(c).edit()
             .putBoolean(KEY_ENABLED, enabled)
             .putInt(KEY_MIN_LENGTH, minLength)
+            .putBoolean(KEY_ALERTS, alerts)
             .apply()
         // Saat pemantauan diaktifkan ulang, pesan sebelum titik ini diabaikan.
         if (turnedOn) markStartNow(c)

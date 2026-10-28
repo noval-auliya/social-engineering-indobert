@@ -88,38 +88,55 @@ class AnalysisService {
         : AiEngineStatus(false, 'Model tidak tersedia: $_loadError');
   }
 
-  Future<AnalysisResult> analyzeMessage(String message) async {
+  /// [explain] = false: hanya skor (~0,1 dtk), penjelasan LIME dihitung
+  /// belakangan lewat [explain]. Dipakai untuk scan otomatis & tampilan cepat.
+  Future<AnalysisResult> analyzeMessage(String message,
+      {bool explain = true}) async {
     final model = await _ensureModel();
     if (model == null) return _analyzeKeywords(message);
     try {
-      return await _analyzeModel(model, message.trim());
+      final scored = await _scoreModel(model, message.trim());
+      return explain ? await _explainWith(model, scored) : scored;
     } catch (e) {
       debugPrint('Inferensi IndoBERT gagal, pakai kata kunci: $e');
       return _analyzeKeywords(message);
     }
   }
 
-  Future<AnalysisResult> _analyzeModel(
+  /// Melengkapi hasil tanpa penjelasan dengan LIME (5–15 dtk di HP).
+  Future<AnalysisResult> explain(AnalysisResult r) async {
+    if (!r.explanationPending) return r;
+    final model = await _ensureModel();
+    if (model == null) return r;
+    return _explainWith(model, r);
+  }
+
+  Future<AnalysisResult> _scoreModel(
       IndoBertClassifier model, String message) async {
     final probs = (await model.predict([message])).first;
     final score = probs[model.riskIndex];
-    final explanation = await LimeTextExplainer(numSamples: limeSamples)
-        .explain(message, model.predict, classIndex: model.riskIndex);
-
     return AnalysisResult(
       message: message,
       riskLevel: _levelFor(score),
       score: score,
       confidence: probs.reduce(max),
-      explanation: explanation.isNotEmpty
-          ? explanation
-          : const [LimeExplanation(word: '(pesan terlalu pendek)', weight: 0)],
+      explanation: const [],
+      explanationPending: true,
       createdAt: DateTime.now(),
       engine: aiEngine,
       probabilities: {
         for (var i = 0; i < model.labels.length; i++) model.labels[i]: probs[i],
       },
     );
+  }
+
+  Future<AnalysisResult> _explainWith(
+      IndoBertClassifier model, AnalysisResult r) async {
+    final explanation = await LimeTextExplainer(numSamples: limeSamples)
+        .explain(r.message, model.predict, classIndex: model.riskIndex);
+    return r.withExplanation(explanation.isNotEmpty
+        ? explanation
+        : const [LimeExplanation(word: '(pesan terlalu pendek)', weight: 0)]);
   }
 
   static RiskLevel _levelFor(double score) => switch (score) {

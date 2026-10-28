@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Notifikasi peringatan pesan berisiko (Android 13+ wajib diminta saat runtime). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="social_engineering_detector"
         android:name="${applicationName}"

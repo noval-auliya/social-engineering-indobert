@@ -5,6 +5,7 @@ import 'package:social_engineering_detector/features/settings/settings_page.dart
 import 'package:social_engineering_detector/core/theme/app_theme.dart';
 import 'package:social_engineering_detector/models/captured_message.dart';
 import 'package:social_engineering_detector/providers/providers.dart';
+import 'package:social_engineering_detector/services/local_store.dart';
 import 'package:social_engineering_detector/services/analysis_service.dart';
 import 'package:social_engineering_detector/services/wa_notification_service.dart';
 
@@ -25,6 +26,7 @@ void main() {
     testWidgets('Pengaturan tampil tanpa error (akses notifikasi=$granted)', (tester) async {
       await tester.pumpWidget(ProviderScope(
         overrides: [
+          localStoreProvider.overrideWithValue(MemoryLocalStore()),
           waNotificationServiceProvider.overrideWithValue(FakeService(granted)),
           aiStatusProvider.overrideWith(
               (ref) async => AiEngineStatus(granted, 'status uji')),

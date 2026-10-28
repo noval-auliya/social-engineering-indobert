@@ -36,7 +36,27 @@ assets/ai/
 
 ## Hasil model saat ini
 
-### Versi 2 (sekarang) — dengan data kontras & augmentasi nomor
+### Versi 3 (sekarang) — distilasi 6 lapis (`distill.py`)
+
+Model "murid" 6 lapis belajar dari versi 2 (guru, 12 lapis). Lapis murid
+disalin dari lapis guru 0,2,4,7,9,11; loss = 0,5·CE + 0,5·KL(T=2).
+Tokenizer/vocab sama, jadi kode Dart tidak berubah.
+
+| | Guru (v2) | **Murid (v3)** |
+|---|---|---|
+| Ukuran ONNX int8 | 125,2 MB | **82,3 MB** |
+| Inferensi 1 pesan (CPU laptop) | 9,2 ms | **4,5 ms** |
+| LIME 100 sampel (CPU laptop) | 0,64 s | **0,33 s** |
+| Data test (145) | 90,3% | **91,0%** |
+| Set kasus sulit (50) | 94% | **96%** |
+
+```bash
+python distill.py                                  # ±25 menit di CPU
+python export_onnx.py --model-dir output/model_student
+python evaluate.py --show-errors
+```
+
+### Versi 2 — dengan data kontras & augmentasi nomor
 
 Masalah versi 1: di dataset SMS, 52% pesan penipuan memuat nomor HP/rekening
 tetapi pesan normal hanya 1%, sehingga model belajar "ada nomor = penipuan".
@@ -121,6 +141,23 @@ flutter test                                              # termasuk cek tokeniz
 flutter test integration_test/indobert_on_device_test.dart -d <device_id>
 flutter build apk --release
 ```
+
+## Melatih ulang dari koreksi di HP (cara termudah mengumpulkan data asli)
+
+1. Di aplikasi: buka **Riwayat** → ketuk entri yang hasilnya salah →
+   **Hasil ini salah? → Koreksi** → pilih label yang benar.
+2. **Pengaturan → Data Koreksi → Ekspor koreksi pesan (CSV)** →
+   simpan `koreksi_pesan.csv`, salin ke `ml/data/`.
+3. `python train.py` lalu `python export_onnx.py` (atau `distill.py` dulu
+   untuk model 6 lapis). Semua `*.csv` di `ml/data/` otomatis ikut dilatih.
+4. **Jangan** salin pesan dari `eval/kasus_sulit.csv` ke data latih —
+   `train.py` otomatis membuangnya agar set uji tetap jujur.
+
+Koreksi APK: ekspor `koreksi_apk.csv` → `ml/malware/data/` →
+`python train_malware.py` (lihat `ml/malware/README.md`).
+
+Isi koreksi adalah pesan WhatsApp asli: hapus nama, nomor HP, dan nomor
+rekening yang bukan milik pelaku sebelum dibagikan ke orang lain.
 
 ## Menambah data sendiri (sangat disarankan)
 

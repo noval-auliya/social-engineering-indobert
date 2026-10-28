@@ -12,6 +12,7 @@ Pemakaian:
   python export_onnx.py
 """
 
+import argparse
 import hashlib
 import json
 import shutil
@@ -102,6 +103,12 @@ def write_vocab(path: Path) -> None:
 
 
 def main() -> None:
+    global MODEL_DIR
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--model-dir", type=Path, default=MODEL_DIR,
+                    help="folder model HuggingFace (mis. output/model_student)")
+    MODEL_DIR = ap.parse_args().model_dir.resolve()
+    print(f"Model: {MODEL_DIR}")
     tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR)
     normalizer = json.loads(
         (MODEL_DIR / "tokenizer.json").read_text(encoding="utf-8"))["normalizer"] or {}

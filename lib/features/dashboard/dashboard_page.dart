@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/history_item.dart';
-import '../../models/malware_result.dart';
 import '../../providers/providers.dart';
 import '../../widgets/stat_tile.dart';
 
@@ -144,15 +143,25 @@ class _DistributionCard extends StatelessWidget {
                     PieChartData(
                       sectionsSpace: 2,
                       centerSpaceRadius: 34,
-                      sections: [
-                        for (final s in sections)
-                          PieChartSectionData(
-                            value: s.value.toDouble(),
-                            color: s.color,
-                            radius: 26,
-                            showTitle: false,
-                          ),
-                      ],
+                      // Riwayat kosong: cincin abu-abu, bukan grafik tanpa data.
+                      sections: stats.total == 0
+                          ? [
+                              PieChartSectionData(
+                                value: 1,
+                                color: theme.colorScheme.surfaceContainerHighest,
+                                radius: 26,
+                                showTitle: false,
+                              ),
+                            ]
+                          : [
+                              for (final s in sections)
+                                PieChartSectionData(
+                                  value: s.value.toDouble(),
+                                  color: s.color,
+                                  radius: 26,
+                                  showTitle: false,
+                                ),
+                            ],
                     ),
                   ),
                 ),
@@ -199,12 +208,13 @@ class _Seg {
   _Seg(this.label, this.value, this.color);
 }
 
-class _RecentTile extends StatelessWidget {
+class _RecentTile extends ConsumerWidget {
   final HistoryItem item;
   const _RecentTile({required this.item});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final soft = ref.watch(settingsProvider.select((s) => s.softLabels));
     final color = AppTheme.severityColor(item.severity);
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -219,7 +229,7 @@ class _RecentTile extends StatelessWidget {
             maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(item.subtitle,
             maxLines: 1, overflow: TextOverflow.ellipsis),
-        trailing: _Badge(text: item.badge, color: color),
+        trailing: _Badge(text: item.badge(soft: soft), color: color),
       ),
     );
   }
