@@ -44,7 +44,9 @@ class WaNotificationListener : NotificationListenerService() {
             ?: extras.getCharSequence(Notification.EXTRA_TITLE))?.toString().orEmpty()
 
         // MessagingStyle menyimpan tiap pesan secara utuh (tidak terpotong).
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        // getMessagesFromBundleArray baru publik di API 30; di API 28-29 masih
+        // hidden API dan bisa crash, jadi Android <= 10 memakai fallback bigText.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             @Suppress("DEPRECATION")
             val bundles = extras.getParcelableArray(Notification.EXTRA_MESSAGES)
             if (!bundles.isNullOrEmpty()) {

@@ -1,5 +1,5 @@
 {
-  "model_file": "indobert_se_bf93159847.onnx",
+  "model_file": "indobert_se_27a65c7d1a.onnx",
   "base_model": "indobenchmark/indobert-base-p1",
   "labels": [
     "normal",

@@ -24,25 +24,25 @@ dan **visualisasi risiko malware Android**, dibangun dari dokumentasi build.
 - **Riwayat** — gabungan hasil pesan & APK, bisa dihapus.
 - **Pengaturan** — tema terang/gelap/sistem, opsi privasi (dummy).
 
+## Dokumentasi
+
+Dokumentasi lengkap ada di folder [docs/](docs/README.md):
+[setup](docs/01-setup.md) · [menjalankan project](docs/02-menjalankan-project.md) ·
+[tech spec](docs/03-tech-spec.md) · [struktur](docs/04-struktur-project.md) ·
+[flow](docs/05-flow.md) · [ERD & data](docs/06-erd.md).
+
 ## Menjalankan
 
-Project ini berisi kode aplikasi, tetapi folder platform Android belum dibuat.
-Jalankan perintah berikut dari folder project menggunakan Flutter SDK 3.27+ dan
-Android toolchain yang sudah terpasang:
-
 ```bash
-flutter create . --platforms=android
+git lfs pull        # model .onnx disimpan dengan Git LFS
 flutter pub get
 flutter run
 ```
 
-Jika `flutter` tidak dikenali, tambahkan folder `bin` dari Flutter SDK ke
-`PATH`, buka terminal baru, lalu cek dengan `flutter doctor`.
-
-Build APK debug:
+Build APK rilis (per arsitektur, lebih kecil):
 
 ```bash
-flutter build apk --debug
+flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64 --obfuscate --split-debug-info=build/symbols
 ```
 
 ## Struktur

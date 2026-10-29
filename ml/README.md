@@ -17,6 +17,7 @@ dataset ─▶ train.py ─▶ export_onnx.py ─▶ assets/ai/ ─▶ tokenizer
 |---|---|
 | `train.py` | Fine-tune `indobenchmark/indobert-base-p1` menjadi klasifikasi 3 label: `normal`, `penipuan`, `promo`. Termasuk augmentasi nomor (lihat bawah). |
 | `export_onnx.py` | Ekspor ke ONNX, kuantisasi int8, verifikasi akurasi, salin ke `../assets/ai/`. |
+| `prune_vocab.py` | Buang baris embedding yang tidak terpakai (vocab_size 50000 → 30521) agar model lebih kecil. |
 | `evaluate.py` | Uji model pada set kasus sulit, akurasi per kategori. |
 | `buat_data_kontras.py` | Membuat `data/kontras.csv`: normal/promo **dengan** nomor, penipuan **tanpa** nomor. |
 | `eval/kasus_sulit.csv` | 50 pesan jebakan yang **tidak pernah dilatih** (dibuang otomatis jika bocor ke data latih). |
@@ -36,7 +37,24 @@ assets/ai/
 
 ## Hasil model saat ini
 
-### Versi 3 (sekarang) — distilasi 6 lapis (`distill.py`)
+### Versi 3.1 (sekarang) — vocab dipangkas (`prune_vocab.py`)
+
+Config IndoBERT memakai `vocab_size=50000`, padahal tokenizer hanya punya
+30.521 token, jadi 19.479 baris embedding tidak pernah terjangkau. Baris itu
+dibuang; output model **identik** (selisih probabilitas 0, kasus sulit tetap
+48/50). Ukuran ONNX int8: 82,3 MB → **67,4 MB**.
+
+`--keep N` bisa memangkas lebih jauh (token jarang dibuang), tetapi tidak
+lossless. Pada kasus sulit: `--keep 20000` mengubah tokenisasi 12% pesan
+(label tetap sama); `--keep 10000` membalik 1 dari 50 label. Belum dipakai.
+
+```bash
+python prune_vocab.py                              # hasil di output/model_pruned
+python export_onnx.py --model-dir output/model_pruned
+python evaluate.py --show-errors
+```
+
+### Versi 3 — distilasi 6 lapis (`distill.py`)
 
 Model "murid" 6 lapis belajar dari versi 2 (guru, 12 lapis). Lapis murid
 disalin dari lapis guru 0,2,4,7,9,11; loss = 0,5·CE + 0,5·KL(T=2).
